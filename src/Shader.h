@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_map>
+#include "glm/glm.hpp"
 
 struct ShaderProgramSource
 {
@@ -10,7 +11,8 @@ struct ShaderProgramSource
 };
 
 
-class Shader {
+class Shader 
+{
 private:
 	std::string m_FilePath;
 	unsigned int m_RendererID;
@@ -22,12 +24,14 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
+	void setUniform1i(const std::string& name, int value);
+	void setUniform1f(const std::string& name, float value);
 	void setUniform4f(const std::string& name, float f0, float f1, float f2, float f3);
-
+	void setUniformMat4f(const std::string& name, glm::mat4 matrix);
 private:
 	unsigned int CompileShader(const std::string& source, unsigned int type);
 	unsigned int createShader(const std::string& vertexShader, const std::string& fragmentShader);
 	ShaderProgramSource ParseShader(const std::string& filepath);
-	unsigned int GetUniformLocation(const std::string& name);
+	int GetUniformLocation(const std::string& name);
 
 };

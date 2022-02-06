@@ -9,6 +9,7 @@
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
 #include "Shader.h"
+#include "Texture.h"
 
 
 int main(void)
@@ -43,37 +44,40 @@ int main(void)
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
 	{
-		float positions[12] = {
-			-0.5f, -0.5f,
-			-0.5f, 0.5f,
-			0.5f, -0.5f,
-
-			// 0.5f, -0.5f,
-			// -0.5f, 0.5f,
-			0.5f, 0.5f,
+		float positions[] = {
+			-0.5f, -0.5f, 0.0f, 0.0f, // 0
+			 0.5f, -0.5f, 1.0f, 0.0f, // 1
+			 0.5f,  0.5f, 1.0f, 1.0f, // 2
+			-0.5f,  0.5f, 0.0f, 1.0f  // 3
 		};
 
 		unsigned int indices[] = {
 			0, 1, 2,
-			1, 2, 3
+			2, 3, 0
 		};
+
+		GLCall(glEnable(GL_BLEND));
+		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
 		unsigned int vao;
 		GLCall(glGenVertexArrays(1, &vao));
 		GLCall(glBindVertexArray(vao));
 
 		VertexArray va;
-		VertexBuffer vb(positions, 4 * 2 * sizeof(float));
+		VertexBuffer vb(positions, 4 * 4 * sizeof(float));
 		VertexBufferLayout layout;
+		layout.Push<float>(2);
 		layout.Push<float>(2);
 		va.AddBuffer(vb, layout);
 
 		IndexBuffer ib(indices, 6);
 
-
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
-		shader.setUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
+
+		Texture texture("res/textures/logo.jpg");
+		texture.Bind(0);
+		shader.setUniform1i("u_Texture", 0);
 
 		va.Unbind();
 		vb.Unbind();
@@ -90,7 +94,6 @@ int main(void)
 			/* Render here */
 			renderer.Clear();
 			shader.Bind();
-			shader.setUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
 
 			renderer.Draw(va, ib, shader);
 
