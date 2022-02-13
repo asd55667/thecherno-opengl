@@ -18,7 +18,6 @@ int main(void)
 {
 	GLFWwindow* window;
 
-	/* Initialize the library */
 	if (!glfwInit())
 		return -1;
 
@@ -26,16 +25,13 @@ int main(void)
 	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-
-	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
 		return -1;
 	}
 
-	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
 	
 	glfwSwapInterval(1);
@@ -47,10 +43,10 @@ int main(void)
 
 	{
 		float positions[] = {
-			-0.5f, -0.5f, 0.0f, 0.0f, // 0
-			 0.5f, -0.5f, 1.0f, 0.0f, // 1
-			 0.5f,  0.5f, 1.0f, 1.0f, // 2
-			-0.5f,  0.5f, 0.0f, 1.0f  // 3
+			100.0f, 100.0f, 0.0f, 0.0f, // 0
+			200.0f, 100.0f, 1.0f, 0.0f, // 1
+			200.0f, 200.0f, 1.0f, 1.0f, // 2
+			100.0f, 200.0f, 0.0f, 1.0f  // 3
 		};
 
 		unsigned int indices[] = {
@@ -73,10 +69,15 @@ int main(void)
 		va.AddBuffer(vb, layout);
 
 		IndexBuffer ib(indices, 6);
-		glm::mat4 proj = glm::ortho(-4.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+		
+		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+		glm::vec4 vp(100.0f, 100.0f, 0.0f, 1.0f);
+
+		glm::vec4 result = proj * vp;
 
 		Shader shader("res/shaders/Basic.shader");
 		shader.Bind();
+		shader.setUniform4f("u_Color", 0.0f, 0.3f, 0.8f, 1.0f);
 		shader.setUniformMat4f("u_MVP", proj);
 
 		Texture texture("res/textures/logo.jpg");
@@ -92,12 +93,11 @@ int main(void)
 
 		float r = 0.0f;
 		float increment = 0.05f;
-		/* Loop until the user closes the window */
 		while (!glfwWindowShouldClose(window))
 		{
-			/* Render here */
 			renderer.Clear();
 			shader.Bind();
+			shader.setUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
 
 			renderer.Draw(va, ib, shader);
 
